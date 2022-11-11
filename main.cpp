@@ -116,7 +116,7 @@ bool existPath = false;
  * Returns:
  *   un valor booleano.
  */
-bool searchEdge(struct  Place* origin, string des) {
+bool searchEdge(struct  Place* origin, string des,Place*pList) {
 
     if((origin == NULL) or (origin->visited == true))
         return existPath;
@@ -128,7 +128,7 @@ bool searchEdge(struct  Place* origin, string des) {
     origin->visited =true;
     struct Edge * tempE = origin->subListEdge;
     while(tempE != NULL){
-        searchEdge(searchPlace(tempE->destination),des);
+        searchEdge(searchPlace(tempE->destination,pList),des,pList);
         tempE = tempE->nextEdge;
     }
 }
@@ -136,7 +136,7 @@ bool searchEdge(struct  Place* origin, string des) {
 
 
 
-bool printEdge(struct Place* origin,string des, string path){
+bool printEdge(struct Place* origin,string des, string path,Place*pList){
     if((origin == NULL) or origin->visited)
         return existPath;
 
@@ -150,7 +150,7 @@ bool printEdge(struct Place* origin,string des, string path){
     struct Edge * tempE = origin->subListEdge;
 
     while(tempE != NULL){
-        printEdge(searchPlace(tempE->destination), des,path+graph->namePlace);
+        printEdge(searchPlace(tempE->destination,pList), des,path+pList->namePlace,pList);
         tempE = tempE->nextEdge;
     }
     origin->visited =false;
@@ -424,5 +424,7 @@ void graph2Load(){
 int main() {
     dataLoad();
     printPeopleList();
+    graph1Load();
+    graph2Load();
     return 0;
 }

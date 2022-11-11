@@ -55,7 +55,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "c:/Users/omega/Documents/C++/Proyecto-2/cmake-build-debug"
+			"value" : "c:/Users/omega/Documents/GitHub/Proyecto-estructuras2/cmake-build-debug"
 		},
 		{
 			"name" : "CMAKE_CACHE_MAJOR_VERSION",
@@ -623,7 +623,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "C:/Users/omega/Documents/C++/Proyecto-2"
+			"value" : "C:/Users/omega/Documents/GitHub/Proyecto-estructuras2"
 		},
 		{
 			"name" : "CMAKE_INSTALL_PREFIX",
@@ -1239,7 +1239,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/Users/omega/Documents/C++/Proyecto-2/cmake-build-debug"
+			"value" : "C:/Users/omega/Documents/GitHub/Proyecto-estructuras2/cmake-build-debug"
 		},
 		{
 			"name" : "Proyecto_2_IS_TOP_LEVEL",
@@ -1263,7 +1263,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/Users/omega/Documents/C++/Proyecto-2"
+			"value" : "C:/Users/omega/Documents/GitHub/Proyecto-estructuras2"
 		}
 	],
 	"kind" : "cache",
