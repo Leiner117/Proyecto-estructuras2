@@ -53,6 +53,17 @@ struct People{
 }*peopleList;
 //*****************************************PLACE******************************
 
+
+/**
+ * Esta función busca un lugar en la lista de lugares
+ *
+ * Args:
+ *   origin (string): el nombre del lugar que desea buscar
+ *   pList (Place): la lista de lugares
+ *
+ * Returns:
+ *   un puntero a un lugar.
+ */
 struct Place* searchPlace(string origin,Place*pList) {
     struct Place* tempP = pList;
     while(tempP != NULL){
@@ -62,6 +73,16 @@ struct Place* searchPlace(string origin,Place*pList) {
     }
     return NULL;
 }
+/**
+ * Esta función crea un nuevo objeto Lugar y lo agrega al frente de la lista vinculada de Lugares
+ *
+ * Args:
+ *   namePlace (string): El nombre del lugar que desea agregar.
+ *   pList (Place): la lista de lugares
+ *
+ * Returns:
+ *   Un puntero al nuevo lugar.
+ */
 Place*addPlace(string namePlace,Place*pList){
     struct Place* newPlace= new Place(namePlace);
     newPlace->nextPlace= pList;
@@ -136,6 +157,18 @@ bool searchEdge(struct  Place* origin, string des,Place*pList) {
 
 
 
+/**
+ * Es una función recursiva que imprime la ruta desde el origen hasta el destino.
+ *
+ * Args:
+ *   origin: El lugar donde comienza la búsqueda.
+ *   des (string): destino
+ *   path (string): es la ruta que se está imprimiendo
+ *   pList (Place): es la lista de lugares
+ *
+ * Returns:
+ *   un valor booleano que indica si hay un camino entre dos lugares.
+ */
 bool printEdge(struct Place* origin,string des, string path,Place*pList){
     if((origin == NULL) or origin->visited)
         return existPath;
@@ -296,10 +329,12 @@ void dataLoad() {
 
 
 
-    //addPeople("Karina", 1, searchPlace("SantaClara"), searchPlace("CQ"));
-    //addPeople("Leiner", 2, searchPlace("CQ"), searchPlace("SantaClara"));
+    addPeople("Karina", 1, searchPlace("SantaClara"), searchPlace("CQ"));
+    addPeople("Leiner", 2, searchPlace("CQ"), searchPlace("SantaClara"));
 
 }
+
+
 void amplitude(){
     struct Place *tempP = graph1;
 
@@ -315,7 +350,7 @@ void amplitude(){
     }
 }
 
-void depth(struct Place * start){
+/*void depth(struct Place * start){
     if((start == NULL) or (start->visited == true)){
         cout<<endl;
         return;
@@ -332,8 +367,8 @@ void depth(struct Place * start){
         tempA = tempA->sigA;
     }
 
-}
-
+}*/
+/*
 void desmarcar(){
     struct Vertice *tempV = grafo;
 
@@ -342,7 +377,13 @@ void desmarcar(){
         tempV->visitado = false;
         tempV = tempV->sigV;
     }
-}
+}*/
+/**
+ * Genera un número aleatorio entre 1 y 10
+ *
+ * Returns:
+ *   un número aleatorio entre 1 y 10.
+ */
 int randomNum(){
     int num, c;
     srand(time(NULL));
@@ -354,21 +395,37 @@ int randomNum(){
         return num;
     }
 }
+/**
+ * Crea un grafo con 5 vertices y 10 arcos.
+ */
 void graph1Load(){
-    graph1 = addPlace("SantaClara",graph1);
-    graph1 = addPlace("CQ",graph1);
-    graph1 = addPlace("Florencia",graph1);
-    graph1 = addPlace("Muelle",graph1);
-    graph1 = addPlace("Platanar",graph1);
+    graph1 = addPlace("SantaClara",graph1);//A
+    graph1 = addPlace("CQ",graph1);//B
+    graph1 = addPlace("Florencia",graph1);//C
+    graph1 = addPlace("Muelle",graph1);//D
+    graph1 = addPlace("Platanar",graph1);//E
+
+    addEdge("SantaClara",randomNum(),"CQ",graph1);
+    addEdge("CQ",randomNum(),"Santa Clara",graph1);
 
     addEdge("CQ",randomNum(),"Florencia",graph1);
     addEdge("Florencia",randomNum(),"CQ",graph1);
-    addEdge("Florencia",randomNum(),"SantaClara",graph1);
-    addEdge("SantaClara",randomNum(),"Florencia",graph1);
-    addEdge("Florencia",randomNum(),"Platanar",graph1);
-    addEdge("Platanar",randomNum(),"Florencia",graph1);
+
+    addEdge("Florencia",randomNum(),"Muelle",graph1);
+    addEdge("Muelle",randomNum(),"Florencia",graph1);
+
+    addEdge("Muelle",randomNum(),"Platanar",graph1);
     addEdge("Platanar",randomNum(),"Muelle",graph1);
+
+    addEdge("Platanar",randomNum(),"SantaClara",graph1);
+    addEdge("SantaClara",randomNum(),"Platanar",graph1);
+
+
+
 }
+/**
+ * Crea un gráfico con 7 nodos y 14 aristas.
+ */
 void graph2Load(){
 
     graph2 = addPlace("SantaClara",graph2);//A
@@ -415,12 +472,9 @@ void graph2Load(){
     addEdge("Tanque",randomNum(),"Fortuna",graph2);
     addEdge("Fortuna",randomNum(),"Tanque",graph2);
 
-
-
-
-
-
 }
+
+
 int main() {
     dataLoad();
     printPeopleList();
