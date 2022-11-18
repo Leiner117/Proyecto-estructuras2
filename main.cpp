@@ -15,6 +15,7 @@ struct Place{
     struct People* subListPeople;
     bool visited;
     Place(string place){
+        subListPeople = NULL;
         namePlace = place;
         nextPlace = NULL;
         subListEdge = NULL;
@@ -58,6 +59,8 @@ struct People{
         placeDestination = des;
         friendsList = NULL;
         next = NULL;
+        typeAdvance = 0;
+        totalTravel = 0;
     }
 
 }*peopleList;
@@ -100,33 +103,33 @@ Place*addPlace(string namePlace,Place*pList){
     return pList;
 
 }
-void addPeopleToPlace(People*newPeople,People*pList){
-    newPeople->next= pList;
-    pList = newPeople;
+void addPeopleToPlace(People*newPeople,Place*pList){
 
+    newPeople->next= pList->subListPeople;
+    pList->subListPeople = newPeople;
 
 }
-void deletePeopleToPlace(People*people,People*pList){
+void deletePeopleToPlace(People*people,Place*pList){
 
     if (people == NULL){
         cout<<"\nLA PERSONA NO EXISTE";
     }
     else{
-        if (pList->id == people->id){
-            pList = pList->next;
+        if (pList->subListPeople->id == people->id){
+            pList->subListPeople = pList->subListPeople->next;
         }
         else{
-            People*temp = pList;
+            Place*temp = pList;
             People*ant = NULL;
-            while((temp!=NULL)&&(temp->id!=people->id)){
-                ant = temp;
-                temp = temp->next;
+            while((temp!=NULL)&&(temp->subListPeople->id!=people->id)){
+                ant = temp->subListPeople;
+                temp->subListPeople = temp->subListPeople;
             }
             if(temp ==NULL){
                 cout<<"\nLA PERSONA NO EXISTE";
 
             }else{
-                ant->next = temp->next;
+                ant->next = temp->subListPeople->next;
             }
         }
     }
@@ -242,7 +245,8 @@ bool printEdge(struct Place* origin,string des, string path,Place*pList){
  *   La lista.
  */
 void addPeople(string name,int id,Place*current,Place*des){
-    People*newPeople = new People(name,id,current,des);
+    Place*origin=current;
+    People*newPeople = new People(name,id,current,current,des);
     newPeople->next = peopleList;
     peopleList = newPeople;
 
@@ -459,8 +463,8 @@ void graph1Load(){
     graph1 = addPlace("Muelle",graph1);//D
     graph1 = addPlace("Platanar",graph1);//E
 
+    addEdge("CQ",randomNum(25),"SantaClara",graph1);
     addEdge("SantaClara",randomNum(25),"CQ",graph1);
-    addEdge("CQ",randomNum(25),"Santa Clara",graph1);
 
     addEdge("CQ",randomNum(25),"Florencia",graph1);
     addEdge("Florencia",randomNum(25),"CQ",graph1);
@@ -543,23 +547,25 @@ Edge*searchIndex(int index,Edge*list){
         if (i == index){
             return temp;
         }
+        i++;
         temp  = temp->nextEdge;
     }
 }
 
 void random_walk(People*p,Place*pList){
-    cout<<p->currentLocation<<endl;
-    int n = 0, num = 0;
+    cout<<"\n"+p->currentLocation->namePlace<<endl;
+    int n = 0;
+    int num = 0;
     n = size(p->currentLocation->subListEdge);
     if (n > 1){
-        int num = randomNum(n);
+         num = randomNum(n);
     }
     Edge*tempList = p->currentLocation->subListEdge;
     Edge*edge = searchIndex(num,tempList);
 
 
     if (p->prePlace !=NULL){
-        while(p->prePlace->namePlace != edge->destination){
+        while(p->prePlace->namePlace == edge->destination){
             num = (randomNum(size(p->currentLocation->subListEdge))-1);
             edge = searchIndex(num,tempList);
 
@@ -567,46 +573,42 @@ void random_walk(People*p,Place*pList){
         }
 
     }
-    deletePeopleToPlace(p,p->currentLocation->subListPeople);
+    deletePeopleToPlace(p,p->currentLocation);
     Place*newPlace = searchPlace(edge->destination,pList);
     p->totalTravel += tempList->distance;
     p->prePlace = p->currentLocation;
     p->currentLocation = newPlace;
-    addPeopleToPlace(p,newPlace->subListPeople);
+    addPeopleToPlace(p,newPlace);
     if (newPlace->subListPeople !=NULL){
         People*temp = newPlace->subListPeople;
         while(temp != NULL){
             addFriends(p,temp);
+            temp = temp->next;
         }
     }
-    cout<<p->currentLocation<<endl;
+    cout<<"\n"+p->currentLocation->namePlace<<endl;
 
 }
 
 /*
-void adjacentRoute(People* people,Place* pList){
+void advacentRoute(People* people,Place* pList){
 
     Place* tempP = people->currentLocation;
     Edge* tempE = tempP->subListEdge;
 
-    while(tempE != NULL){
-        if(tempE->distance < tempE->nextEdge->distance){
+    while(tempE != NULL) {
+        if (tempE->distance < tempE->nextEdge->distance) {
             people->prePlace = people->currentLocation;
-            Place*newPlace = searchPlace(tempE->destination,pList);
-            people->currentPlace = newPlace;
-
-
+            Place *newPlace = searchPlace(tempE->destination, pList);
+            people->currentLocation = newPlace;
         }
         else{
-
+            people->prePlace = people->currentLocation;
+            Place *newPlace = searchPlace(tempE->nextEdge->destination, pList);
+            people->currentLocation = newPlace;
         }
-
-
-
+        tempE=tempE->nextEdge;
     }
-
-
-
 }
 */
 
@@ -674,9 +676,9 @@ int main() {
     printPeopleList();
     graph1Load();
     graph2Load();
-
     People*p = new People("Leiner",1, searchPlace("CQ",graph1),searchPlace("CQ",graph1),searchPlace("Florencia",graph1));
     addPeopleToPlace(p,searchPlace("CQ",graph1));
+    random_walk(p,graph1);
     random_walk(p,graph1);
     if(searchEdge(searchPlace("SantaClara",graph1),"CQ",graph1)){
         cout<<"si";
