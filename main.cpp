@@ -48,9 +48,9 @@ struct People{
     struct Place*origin;
     struct Place*currentLocation;
     struct People*friendsList;
-    struct Place*placeDestination;
+    string placeDestination;
     struct People*next;
-    People(string n,int i,Place* orig,Place*current,Place*des){
+    People(string n,int i,Place* orig,Place*current,string  des){
         origin = orig;
         name= n;
         id = i;
@@ -134,7 +134,17 @@ void deletePeopleToPlace(People*people,Place*pList){
         }
     }
 }
+void printPlace(Place*pList){
+    Place*temp = pList;
+    while(temp != NULL){
+        if (temp->subListEdge != NULL){
+            cout<<temp->subListEdge->distance<<endl;
+        }
 
+        temp = temp->nextPlace;
+    }
+
+}
 //*****************************************************EDGE*****************************************************
 /**
  * * Crea un nuevo arco entre el vertice origen y el vertice destino
@@ -244,7 +254,7 @@ bool printEdge(struct Place* origin,string des, string path,Place*pList){
  * Returns:
  *   La lista.
  */
-void addPeople(string name,int id,Place*current,Place*des){
+void addPeople(string name,int id,Place*current,string des){
     Place*origin=current;
     People*newPeople = new People(name,id,current,current,des);
     newPeople->next = peopleList;
@@ -290,7 +300,7 @@ People*searchPeople(int id){
  *   la lista de personas
  */
 
-void modPeople(int oldId,string newName,int newId,Place*current,Place*des){
+void modPeople(int oldId,string newName,int newId,Place*current,string des){
     People*people = searchPeople(oldId);
     if(people == NULL){
         cout<<"\nLA PERSONA NO SE ENCUENTRA REGISTRADA "<<endl;
@@ -356,7 +366,7 @@ void printPeopleList(){
             cout<<temp->name<<endl;
             cout<<temp->id<<endl;
             cout<<temp->currentLocation->namePlace<<endl;
-            cout<<temp->placeDestination->namePlace<<endl;
+            cout<<temp->placeDestination<<endl;
             temp = temp->next;
         }
     }
@@ -456,27 +466,27 @@ int randomNum(int random){
  * Crea un grafo con 5 vertices y 10 arcos.
  */
 void graph1Load(){
-
+    int num = 0;
     graph1 = addPlace("SantaClara",graph1);//A
     graph1 = addPlace("CQ",graph1);//B
     graph1 = addPlace("Florencia",graph1);//C
     graph1 = addPlace("Muelle",graph1);//D
     graph1 = addPlace("Platanar",graph1);//E
-
-    addEdge("CQ",randomNum(25),"SantaClara",graph1);
-    addEdge("SantaClara",randomNum(25),"CQ",graph1);
-
-    addEdge("CQ",randomNum(25),"Florencia",graph1);
-    addEdge("Florencia",randomNum(25),"CQ",graph1);
-
-    addEdge("Florencia",randomNum(25),"Muelle",graph1);
-    addEdge("Muelle",randomNum(25),"Florencia",graph1);
-
-    addEdge("Muelle",randomNum(25),"Platanar",graph1);
-    addEdge("Platanar",randomNum(25),"Muelle",graph1);
-
-    addEdge("Platanar",randomNum(25),"SantaClara",graph1);
-    addEdge("SantaClara",randomNum(25),"Platanar",graph1);
+    num = randomNum(100);
+    addEdge("CQ",num,"SantaClara",graph1);
+    addEdge("SantaClara",num,"CQ",graph1);
+    num = randomNum(100);
+    addEdge("CQ",num ,"Florencia",graph1);
+    addEdge("Florencia",num,"CQ",graph1);
+    num = randomNum(100);
+    addEdge("Florencia",num,"Muelle",graph1);
+    addEdge("Muelle",num,"Florencia",graph1);
+    num = randomNum(100);
+    addEdge("Muelle",num,"Platanar",graph1);
+    addEdge("Platanar",num,"Muelle",graph1);
+    num = randomNum(100);
+    addEdge("Platanar",num,"SantaClara",graph1);
+    addEdge("SantaClara",num,"Platanar",graph1);
 
 }
 /**
@@ -492,44 +502,45 @@ void graph2Load(){
     graph2 = addPlace("Tanque",graph2);//F
     graph2 = addPlace("Fortuna",graph2);//G
 
-    addEdge("SantaClara",randomNum(25),"CQ",graph2);
-    addEdge("CQ",randomNum(25),"SantaClara",graph2);
+    addEdge("SantaClara",randomNum(100),"CQ",graph2);
 
-    addEdge("SantaClara",randomNum(25),"Florencia",graph2);
-    addEdge("Florencia",randomNum(25),"SantaClara",graph2);
+    addEdge("CQ",randomNum(100),"SantaClara",graph2);
 
-    addEdge("SantaClara",randomNum(25),"Muelle",graph2);
-    addEdge("Muelle",randomNum(25),"SantaClara",graph2);
+    addEdge("SantaClara",randomNum(100),"Florencia",graph2);
+    addEdge("Florencia",randomNum(100),"SantaClara",graph2);
 
-    addEdge("SantaClara",randomNum(25),"Platanar",graph2);
-    addEdge("Platanar",randomNum(25),"SantaClara",graph2);
+    addEdge("SantaClara",randomNum(100),"Muelle",graph2);
+    addEdge("Muelle",randomNum(100),"SantaClara",graph2);
 
-    addEdge("SantaClara",randomNum(25),"Tanque",graph2);
-    addEdge("Tanque",randomNum(25),"SantaClara",graph2);
+    addEdge("SantaClara",randomNum(100),"Platanar",graph2);
+    addEdge("Platanar",randomNum(100),"SantaClara",graph2);
 
-    addEdge("SantaClara",randomNum(25),"Fortuna",graph2);
-    addEdge("Fortuna",randomNum(25),"SantaClara",graph2);
+    addEdge("SantaClara",randomNum(100),"Tanque",graph2);
+    addEdge("Tanque",randomNum(100),"SantaClara",graph2);
 
-    addEdge("CQ",randomNum(25),"Florencia",graph2);
-    addEdge("CQ",randomNum(25),"Fortuna",graph2);
+    addEdge("SantaClara",randomNum(100),"Fortuna",graph2);
+    addEdge("Fortuna",randomNum(100),"SantaClara",graph2);
 
-    addEdge("Florencia",randomNum(25),"Muelle",graph2);
-    addEdge("Muelle",randomNum(25),"Florencia",graph2);
+    addEdge("CQ",randomNum(100),"Florencia",graph2);
+    addEdge("CQ",randomNum(100),"Fortuna",graph2);
 
-    addEdge("Florencia",randomNum(25),"Tanque",graph2);
-    addEdge("Tanque",randomNum(25),"Florencia",graph2);
+    addEdge("Florencia",randomNum(100),"Muelle",graph2);
+    addEdge("Muelle",randomNum(100),"Florencia",graph2);
 
-    addEdge("Muelle",randomNum(25),"Platanar",graph2);
-    addEdge("Platanar",randomNum(25),"Muelle",graph2);
+    addEdge("Florencia",randomNum(100),"Tanque",graph2);
+    addEdge("Tanque",randomNum(100),"Florencia",graph2);
 
-    addEdge("Platanar",randomNum(25),"Tanque",graph2);
-    addEdge("Tanque",randomNum(25),"Platanar",graph2);
+    addEdge("Muelle",randomNum(100),"Platanar",graph2);
+    addEdge("Platanar",randomNum(100),"Muelle",graph2);
 
-    addEdge("Tanque",randomNum(25),"Fortuna",graph2);
-    addEdge("Fortuna",randomNum(25),"Tanque",graph2);
+    addEdge("Platanar",randomNum(100),"Tanque",graph2);
+    addEdge("Tanque",randomNum(100),"Platanar",graph2);
 
-    addEdge("Fortuna",randomNum(25),"CQ",graph2);
-    addEdge("Florencia",randomNum(25),"CQ",graph2);
+    addEdge("Tanque",randomNum(100),"Fortuna",graph2);
+    addEdge("Fortuna",randomNum(100),"Tanque",graph2);
+
+    addEdge("Fortuna",randomNum(100),"CQ",graph2);
+    addEdge("Florencia",randomNum(100),"CQ",graph2);
 }
 int size(Edge*list){
     int cont =0;
@@ -596,9 +607,9 @@ void advacentRoute(People* people,Place* pList){
     Edge* tempE = tempP->subListEdge;
 
     while(tempP != NULL) {
-        if (tempP->subListEdge->distance < tempP->subListEdge->nextEdge->distance) {
+        if (tempP->subListEdge->distance <= tempP->subListEdge->nextEdge->distance) {
             people->prePlace = people->currentLocation;
-            Place *newPlace = searchPlace(tempE->destination, pList);
+            Place *newPlace = searchPlace(tempP->subListEdge->destination, pList);
             people->currentLocation = newPlace;
         }
         else{
@@ -688,11 +699,12 @@ int main() {
     printPeopleList();
     graph1Load();
     graph2Load();
-    People*p = new People("Leiner",1, searchPlace("CQ",graph1),searchPlace("CQ",graph1),searchPlace("Florencia",graph1));
+    printPlace(graph1);
+    People*p = new People("Leiner",1, searchPlace("CQ",graph1),searchPlace("CQ",graph1),"Florencia");
     addPeopleToPlace(p,searchPlace("CQ",graph1));
 
-    cout<<"\n******************** PRUEBA DE RECORRIDO ADYACENTE ********************\n";
-    advacentRoute(p,graph1);
+  /*  cout<<"\n******************** PRUEBA DE RECORRIDO ADYACENTE ********************\n";
+    advacentRoute(p,graph1);*/
 
 
 
