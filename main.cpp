@@ -137,9 +137,13 @@ void deletePeopleToPlace(People*people,Place*pList){
 void printPlace(Place*pList){
     Place*temp = pList;
     while(temp != NULL){
-        if (temp->subListEdge != NULL){
-            cout<<temp->subListEdge->distance<<endl;
+        while(temp->subListEdge != NULL){
+            cout<<temp->namePlace<<"->"<<temp->subListEdge->destination+": "<<temp->subListEdge->distance<<endl;
+            temp->subListEdge = temp->subListEdge->nextEdge;
+
         }
+
+
 
         temp = temp->nextPlace;
     }
@@ -696,7 +700,7 @@ bool short_route(struct Place*origin, string destino, string ruta, int dis, Plac
 
 int main() {
 
-    printPeopleList();
+    //printPeopleList();
     graph1Load();
     graph2Load();
     printPlace(graph1);
