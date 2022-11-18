@@ -568,8 +568,6 @@ void random_walk(People*p,Place*pList){
         while(p->prePlace->namePlace == edge->destination){
             num = (randomNum(size(p->currentLocation->subListEdge))-1);
             edge = searchIndex(num,tempList);
-
-
         }
 
     }
@@ -578,7 +576,7 @@ void random_walk(People*p,Place*pList){
     p->totalTravel += tempList->distance;
     p->prePlace = p->currentLocation;
     p->currentLocation = newPlace;
-    addPeopleToPlace(p,newPlace);
+
     if (newPlace->subListPeople !=NULL){
         People*temp = newPlace->subListPeople;
         while(temp != NULL){
@@ -586,31 +584,45 @@ void random_walk(People*p,Place*pList){
             temp = temp->next;
         }
     }
+    addPeopleToPlace(p,newPlace);
     cout<<"\n"+p->currentLocation->namePlace<<endl;
 
 }
 
-/*
+
 void advacentRoute(People* people,Place* pList){
 
     Place* tempP = people->currentLocation;
     Edge* tempE = tempP->subListEdge;
 
-    while(tempE != NULL) {
-        if (tempE->distance < tempE->nextEdge->distance) {
+    while(tempP != NULL) {
+        if (tempP->subListEdge->distance < tempP->subListEdge->nextEdge->distance) {
             people->prePlace = people->currentLocation;
             Place *newPlace = searchPlace(tempE->destination, pList);
             people->currentLocation = newPlace;
         }
         else{
             people->prePlace = people->currentLocation;
+            deletePeopleToPlace(people,people->currentLocation);
+            people->totalTravel += tempE->distance;
             Place *newPlace = searchPlace(tempE->nextEdge->destination, pList);
             people->currentLocation = newPlace;
         }
         tempE=tempE->nextEdge;
+
     }
+    Place *newPlace = searchPlace(tempE->destination, pList);
+    if (newPlace->subListPeople !=NULL){
+        People*temp = newPlace->subListPeople;
+        while(temp != NULL){
+            addFriends(people,temp);
+            temp = temp->next;
+        }
+    }
+    addPeopleToPlace(people,newPlace);
+
 }
-*/
+
 
 bool searchPath( struct Place * origin, string destination,Place* pList){
 
@@ -678,8 +690,22 @@ int main() {
     graph2Load();
     People*p = new People("Leiner",1, searchPlace("CQ",graph1),searchPlace("CQ",graph1),searchPlace("Florencia",graph1));
     addPeopleToPlace(p,searchPlace("CQ",graph1));
-    random_walk(p,graph1);
-    random_walk(p,graph1);
+
+    cout<<"\n******************** PRUEBA DE RECORRIDO ADYACENTE ********************\n";
+    advacentRoute(p,graph1);
+
+
+
+
+
+
+
+
+
+
+
+    //random_walk(p,graph1);
+    //random_walk(p,graph1);
     if(searchEdge(searchPlace("SantaClara",graph1),"CQ",graph1)){
         cout<<"si";
     }
