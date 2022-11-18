@@ -3,12 +3,16 @@
 #include<time.h>
 using namespace std;
 
+
+bool existPath = false;
+
 //Estructura Lugar
 struct Place{
 
     string namePlace;
     struct Place* nextPlace; //para enlazar todos los vertices en una lista
     struct Edge* subListEdge; //representa los arcos que salen de ese vertice
+    struct People* subListPeople;
     bool visited;
     Place(string place){
         namePlace = place;
@@ -16,7 +20,7 @@ struct Place{
         subListEdge = NULL;
         visited = false;
     }
-}*placeList;
+};
 
 //Estructura Arco
 struct Edge{
@@ -37,13 +41,19 @@ struct Place* graph2; // el apuntador inicial del grafo
 struct People{
     string name;
     int id;
+    short typeAdvance;
+    int totalTravel; // el total de distancia recorrida
+    struct Place*prePlace;
+    struct Place*origin;
     struct Place*currentLocation;
     struct People*friendsList;
     struct Place*placeDestination;
     struct People*next;
-    People(string n,int i,Place*current,Place*des){
+    People(string n,int i,Place* orig,Place*current,Place*des){
+        origin = orig;
         name= n;
         id = i;
+        prePlace = NULL;
         currentLocation = current;
         placeDestination = des;
         friendsList = NULL;
@@ -90,6 +100,37 @@ Place*addPlace(string namePlace,Place*pList){
     return pList;
 
 }
+void addPeopleToPlace(People*newPeople,People*pList){
+    newPeople->next= pList;
+    pList = newPeople;
+
+
+}
+void deletePeopleToPlace(People*people,People*pList){
+
+    if (people == NULL){
+        cout<<"\nLA PERSONA NO EXISTE";
+    }
+    else{
+        if (pList->id == people->id){
+            pList = pList->next;
+        }
+        else{
+            People*temp = pList;
+            People*ant = NULL;
+            while((temp!=NULL)&&(temp->id!=people->id)){
+                ant = temp;
+                temp = temp->next;
+            }
+            if(temp ==NULL){
+                cout<<"\nLA PERSONA NO EXISTE";
+
+            }else{
+                ant->next = temp->next;
+            }
+        }
+    }
+}
 
 //*****************************************************EDGE*****************************************************
 /**
@@ -125,8 +166,6 @@ void addEdge(string origin,int dis,string des,struct Place * pList){
 
 }
 
-
-bool existPath = false;
 /**
  * Función recursiva que busca un camino entre dos lugares.
  *
@@ -154,9 +193,6 @@ bool searchEdge(struct  Place* origin, string des,Place*pList) {
     }
 }
 
-
-
-
 /**
  * Es una función recursiva que imprime la ruta desde el origen hasta el destino.
  *
@@ -172,14 +208,12 @@ bool searchEdge(struct  Place* origin, string des,Place*pList) {
 bool printEdge(struct Place* origin,string des, string path,Place*pList){
     if((origin == NULL) or origin->visited)
         return existPath;
-
     if(origin->namePlace == des){
         cout<<"\n\nRuta................  "<<path<<des;
         existPath= true;
         return existPath;
     }
-    origin->visited =true;
-
+    origin->visited = true;
     struct Edge * tempE = origin->subListEdge;
 
     while(tempE != NULL){
@@ -188,7 +222,6 @@ bool printEdge(struct Place* origin,string des, string path,Place*pList){
     }
     origin->visited =false;
 }
-
 
 //*******************************************************************************************************
 
@@ -325,14 +358,22 @@ void printPeopleList(){
     }
 }
 
+void addFriends(People*p,People*newFriend){
+
+    newFriend->next = p->friendsList;
+    p->friendsList = newFriend;
+}
+/*
 void dataLoad() {
 
+    addPeople("Karina", 1, searchPlace("SantaClara",placeList), searchPlace("CQ",placeList));
+    addPeople("Leiner", 2, searchPlace("CQ",placeList), searchPlace("SantaClara",placeList));
+    addPeople("Tania", 3, searchPlace("Florencia",placeList), searchPlace("Muelle",placeList));
+    addPeople("Leidy", 4, searchPlace("Platanar",placeList), searchPlace("SantaClara",placeList));
+    addPeople("Enrique", 5, searchPlace("CQ",placeList), searchPlace("Florencia",placeList));
+    addPeople("Prueba", 6, searchPlace("Muelle",placeList), searchPlace("SantaClara",placeList));
 
-
-    addPeople("Karina", 1, searchPlace("SantaClara"), searchPlace("CQ"));
-    addPeople("Leiner", 2, searchPlace("CQ"), searchPlace("SantaClara"));
-
-}
+}*/
 
 
 void amplitude(){
@@ -350,48 +391,60 @@ void amplitude(){
     }
 }
 
-/*void depth(struct Place * start){
+/**
+ * Imprime el nombre del lugar, el nombre del destino, la distancia entre ellos, y luego se llama a sí mismo con el destino
+ * como parámetro
+ *
+ * Args:
+ *   start: es el lugar donde comienza el algoritmo
+ *
+ * Returns:
+ *   el número de lugares que hay en la gráfica.
+ */
+
+void depth(struct Place * start,Place* pList){
+
     if((start == NULL) or (start->visited == true)){
         cout<<endl;
         return;
     }
-
     start->visited = true;
-
     struct Edge*  tempE = start->subListEdge;
     while(tempE != NULL){
         cout<<start->namePlace<<tempE->destination<<tempE->distance<<",  ";
 
-        profundidad(buscarVertice(tempE->destination));
+        depth(searchPlace(tempE->destination,pList),pList);
 
-        tempA = tempA->sigA;
+        tempE = tempE->nextEdge;
     }
+}
 
-}*/
-/*
-void desmarcar(){
-    struct Vertice *tempV = grafo;
 
-    while(tempV != NULL){
+void unselect() {
 
-        tempV->visitado = false;
-        tempV = tempV->sigV;
+    struct Place *tempP = graph1;
+
+    while (tempP != NULL) {
+
+        tempP->visited = false;
+        tempP = tempP->nextPlace;
     }
-}*/
+}
 /**
  * Genera un número aleatorio entre 1 y 10
  *
  * Returns:
  *   un número aleatorio entre 1 y 10.
  */
-int randomNum(){
-    int num, c;
+
+int randomNum(int random){
+    int num = 0,c;
     srand(time(NULL));
 
 
-    for(c = 1; c <= 25; c++)
+    for(c = 1; c <= random; c++)
     {
-        num = 1 + rand() % (11 - 1);
+        num = 1 + rand() % (random - 1);
         return num;
     }
 }
@@ -399,32 +452,31 @@ int randomNum(){
  * Crea un grafo con 5 vertices y 10 arcos.
  */
 void graph1Load(){
+
     graph1 = addPlace("SantaClara",graph1);//A
     graph1 = addPlace("CQ",graph1);//B
     graph1 = addPlace("Florencia",graph1);//C
     graph1 = addPlace("Muelle",graph1);//D
     graph1 = addPlace("Platanar",graph1);//E
 
-    addEdge("SantaClara",randomNum(),"CQ",graph1);
-    addEdge("CQ",randomNum(),"Santa Clara",graph1);
+    addEdge("SantaClara",randomNum(25),"CQ",graph1);
+    addEdge("CQ",randomNum(25),"Santa Clara",graph1);
 
-    addEdge("CQ",randomNum(),"Florencia",graph1);
-    addEdge("Florencia",randomNum(),"CQ",graph1);
+    addEdge("CQ",randomNum(25),"Florencia",graph1);
+    addEdge("Florencia",randomNum(25),"CQ",graph1);
 
-    addEdge("Florencia",randomNum(),"Muelle",graph1);
-    addEdge("Muelle",randomNum(),"Florencia",graph1);
+    addEdge("Florencia",randomNum(25),"Muelle",graph1);
+    addEdge("Muelle",randomNum(25),"Florencia",graph1);
 
-    addEdge("Muelle",randomNum(),"Platanar",graph1);
-    addEdge("Platanar",randomNum(),"Muelle",graph1);
+    addEdge("Muelle",randomNum(25),"Platanar",graph1);
+    addEdge("Platanar",randomNum(25),"Muelle",graph1);
 
-    addEdge("Platanar",randomNum(),"SantaClara",graph1);
-    addEdge("SantaClara",randomNum(),"Platanar",graph1);
-
-
+    addEdge("Platanar",randomNum(25),"SantaClara",graph1);
+    addEdge("SantaClara",randomNum(25),"Platanar",graph1);
 
 }
 /**
- * Crea un gráfico con 7 nodos y 14 aristas.
+ * Crea un gráfico con 7 vertice y 26 arcos.
  */
 void graph2Load(){
 
@@ -436,49 +488,228 @@ void graph2Load(){
     graph2 = addPlace("Tanque",graph2);//F
     graph2 = addPlace("Fortuna",graph2);//G
 
-    addEdge("SantaClara",randomNum(),"CQ",graph2);
-    addEdge("CQ",randomNum(),"SantaClara",graph2);
+    addEdge("SantaClara",randomNum(25),"CQ",graph2);
+    addEdge("CQ",randomNum(25),"SantaClara",graph2);
 
-    addEdge("SantaClara",randomNum(),"Florencia",graph2);
-    addEdge("Florencia",randomNum(),"SantaClara",graph2);
+    addEdge("SantaClara",randomNum(25),"Florencia",graph2);
+    addEdge("Florencia",randomNum(25),"SantaClara",graph2);
 
-    addEdge("SantaClara",randomNum(),"Muelle",graph2);
-    addEdge("Muelle",randomNum(),"SantaClara",graph2);
+    addEdge("SantaClara",randomNum(25),"Muelle",graph2);
+    addEdge("Muelle",randomNum(25),"SantaClara",graph2);
 
-    addEdge("SantaClara",randomNum(),"Platanar",graph2);
-    addEdge("Platanar",randomNum(),"SantaClara",graph2);
+    addEdge("SantaClara",randomNum(25),"Platanar",graph2);
+    addEdge("Platanar",randomNum(25),"SantaClara",graph2);
 
-    addEdge("SantaClara",randomNum(),"Tanque",graph2);
-    addEdge("Tanque",randomNum(),"SantaClara",graph2);
+    addEdge("SantaClara",randomNum(25),"Tanque",graph2);
+    addEdge("Tanque",randomNum(25),"SantaClara",graph2);
 
-    addEdge("SantaClara",randomNum(),"Fortuna",graph2);
-    addEdge("Fortuna",randomNum(),"SantaClara",graph2);
+    addEdge("SantaClara",randomNum(25),"Fortuna",graph2);
+    addEdge("Fortuna",randomNum(25),"SantaClara",graph2);
 
-    addEdge("CQ",randomNum(),"Florencia",graph2);
-    addEdge("CQ",randomNum(),"Fortuna",graph2);
+    addEdge("CQ",randomNum(25),"Florencia",graph2);
+    addEdge("CQ",randomNum(25),"Fortuna",graph2);
 
-    addEdge("Florencia",randomNum(),"Muelle",graph2);
-    addEdge("Muelle",randomNum(),"Florencia",graph2);
+    addEdge("Florencia",randomNum(25),"Muelle",graph2);
+    addEdge("Muelle",randomNum(25),"Florencia",graph2);
 
-    addEdge("Florencia",randomNum(),"Tanque",graph2);
-    addEdge("Tanque",randomNum(),"Florencia",graph2);
+    addEdge("Florencia",randomNum(25),"Tanque",graph2);
+    addEdge("Tanque",randomNum(25),"Florencia",graph2);
 
-    addEdge("Muelle",randomNum(),"Platanar",graph2);
-    addEdge("Platanar",randomNum(),"Muelle",graph2);
+    addEdge("Muelle",randomNum(25),"Platanar",graph2);
+    addEdge("Platanar",randomNum(25),"Muelle",graph2);
 
-    addEdge("Platanar",randomNum(),"Tanque",graph2);
-    addEdge("Tanque",randomNum(),"Platanar",graph2);
+    addEdge("Platanar",randomNum(25),"Tanque",graph2);
+    addEdge("Tanque",randomNum(25),"Platanar",graph2);
 
-    addEdge("Tanque",randomNum(),"Fortuna",graph2);
-    addEdge("Fortuna",randomNum(),"Tanque",graph2);
+    addEdge("Tanque",randomNum(25),"Fortuna",graph2);
+    addEdge("Fortuna",randomNum(25),"Tanque",graph2);
+
+    addEdge("Fortuna",randomNum(25),"CQ",graph2);
+    addEdge("Florencia",randomNum(25),"CQ",graph2);
+}
+int size(Edge*list){
+    int cont =0;
+    Edge*temp = list;
+    while(temp !=NULL){
+        cont++;
+        temp = temp->nextEdge;
+    }
+    return cont;
+}
+Edge*searchIndex(int index,Edge*list){
+    Edge*temp = list;
+    int i = 0;
+    while(temp != NULL){
+        if (i == index){
+            return temp;
+        }
+        temp  = temp->nextEdge;
+    }
+}
+
+void random_walk(People*p,Place*pList){
+    cout<<p->currentLocation<<endl;
+    int n = 0, num = 0;
+    n = size(p->currentLocation->subListEdge);
+    if (n > 1){
+        int num = randomNum(n);
+    }
+    Edge*tempList = p->currentLocation->subListEdge;
+    Edge*edge = searchIndex(num,tempList);
+
+
+    if (p->prePlace !=NULL){
+        while(p->prePlace->namePlace != edge->destination){
+            num = (randomNum(size(p->currentLocation->subListEdge))-1);
+            edge = searchIndex(num,tempList);
+
+
+        }
+
+    }
+    deletePeopleToPlace(p,p->currentLocation->subListPeople);
+    Place*newPlace = searchPlace(edge->destination,pList);
+    p->totalTravel += tempList->distance;
+    p->prePlace = p->currentLocation;
+    p->currentLocation = newPlace;
+    addPeopleToPlace(p,newPlace->subListPeople);
+    if (newPlace->subListPeople !=NULL){
+        People*temp = newPlace->subListPeople;
+        while(temp != NULL){
+            addFriends(p,temp);
+        }
+    }
+    cout<<p->currentLocation<<endl;
 
 }
 
+/*
+void adjacentRoute(People* people,Place* pList){
+
+    Place* tempP = people->currentLocation;
+    Edge* tempE = tempP->subListEdge;
+
+    while(tempE != NULL){
+        if(tempE->distance < tempE->nextEdge->distance){
+            people->prePlace = people->currentLocation;
+            Place*newPlace = searchPlace(tempE->destination,pList);
+            people->currentPlace = newPlace;
+
+
+        }
+        else{
+
+        }
+
+
+
+    }
+
+
+
+}
+*/
+
+bool searchPath( struct Place * origin, string destination,Place* pList){
+
+    if((origin == NULL) or (origin->visited == true))
+        return existPath;
+
+    if(origin->namePlace == destination){
+        existPath= true;
+        return existPath;
+    }
+    origin->visited =true;
+
+    struct Edge * tempE = origin->subListEdge;
+    while(tempE!= NULL){
+
+        searchPath(searchPlace(tempE->destination,pList), destination,pList);
+        tempE = tempE->nextEdge;
+    }
+}
+
+/**
+ * La función anterior es una función recursiva que encuentra el camino más corto entre dos lugares.
+ *
+ * Args:
+ *   origen: El origen de la ruta.
+ *   destino (string): El destino de la ruta.
+ *   ruta (string): es el camino que se va construyendo
+ *   dis (int): distancia
+ *   pList (Place): es la lista de lugares
+ *
+ * Returns:
+ *   un valor booleano que indica si hay una ruta entre el origen y el destino.
+ */
+
+string rutaMenor = "";
+int distanciaMenor = 0;
+
+bool short_route(struct Place*origin, string destino, string ruta, int dis, Place*pList,People*people){
+
+    if((origin == NULL) or (origin->visited == true))
+        return existPath;
+
+    if(origin->namePlace == destino){
+        if((distanciaMenor==0) || (dis < distanciaMenor)){
+            distanciaMenor =dis;
+            rutaMenor = ruta+destino;
+        }
+        existPath = true;
+        return existPath;
+    }
+    origin->visited =true;
+
+    struct Edge *tempA =origin->subListEdge;
+    while(tempA != NULL){
+        short_route(searchPlace(tempA->destination,pList), destino, ruta + origin->namePlace, dis + tempA->distance, pList,people);
+        tempA = tempA->nextEdge;
+    }
+    origin->visited =false;
+}
 
 int main() {
-    dataLoad();
+
     printPeopleList();
     graph1Load();
     graph2Load();
+
+    People*p = new People("Leiner",1, searchPlace("CQ",graph1),searchPlace("CQ",graph1),searchPlace("Florencia",graph1));
+    addPeopleToPlace(p,searchPlace("CQ",graph1));
+    random_walk(p,graph1);
+    if(searchEdge(searchPlace("SantaClara",graph1),"CQ",graph1)){
+        cout<<"si";
+    }
+
+    cout<<"\n\n---------------Averigurar si hay ruta de CQ a Fortuna:\n";
+
+    searchPath(searchPlace("CQ",graph1), "SantaClara",graph1);
+    if(existPath == true)
+        cout<<"\n Si existe ruta";
+    else
+        cout<<"\nNo existe ruta";
+
+    existPath= false;
+    unselect();
+
+
+    cout<<"\n\n.................Rutas Cortas...................\n";
+
+    short_route(searchPlace("SantaClara",graph1), "CQ", "",0,graph1,p);
+    if(existPath == true){
+        cout<<"\n\nLa ruta mas corta es: "<<rutaMenor
+            << "con una distancia de: "<<distanciaMenor;
+    }
+    else cout<<"\n\nNo existe ruta.................";
+
+    rutaMenor = "";
+    distanciaMenor= 0;
+    existPath= false;
+    unselect();
+
+
     return 0;
 }
+
+
