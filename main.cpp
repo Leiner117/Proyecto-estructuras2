@@ -45,22 +45,31 @@ struct People{
     short typeAdvance;
     int totalTravel; // el total de distancia recorrida
     struct Place*prePlace;
-    struct Place*origin;
+    string origin;
     struct Place*currentLocation;
     struct People*friendsList;
     string placeDestination;
-    struct People*next;
-    People(string n,int i,Place* orig,Place*current,string  des){
+    struct People*next = NULL;
+    bool finish;
+    int steps;
+    int totalSteps;
+    Edge*localDestination;
+    People(string n,int i,string orig,string  des,short type){
         origin = orig;
         name= n;
         id = i;
         prePlace = NULL;
-        currentLocation = current;
+        currentLocation = NULL;
         placeDestination = des;
         friendsList = NULL;
         next = NULL;
         typeAdvance = 0;
         totalTravel = 0;
+        finish = false;
+        typeAdvance = type;
+        steps = 0;
+        totalSteps = 0;
+        localDestination =NULL;
     }
 
 }*peopleList;
@@ -258,11 +267,21 @@ bool printEdge(struct Place* origin,string des, string path,Place*pList){
  * Returns:
  *   La lista.
  */
-void addPeople(string name,int id,Place*current,string des){
-    Place*origin=current;
-    People*newPeople = new People(name,id,current,current,des);
+void addPeople(string name,int id,string orig,string des,short typeAdvange,Place*graph){
+    Place*origin=searchPlace(orig,graph);
+    Place*dest = searchPlace(des,graph);
+    if( (origin == NULL) || (dest ==NULL)) {
+        cout<<"\n"<<"EL LUGAR DE ORIGEN O DESTINO NO EXISTEN"<<endl;
+        return;
+    }
+
+    People*newPeople = new People(name,id,orig,des,typeAdvange);
+
+    newPeople->currentLocation = origin;
+    addPeopleToPlace(newPeople,origin);
     newPeople->next = peopleList;
     peopleList = newPeople;
+    cout<<"La persona se agrego con exito"<<endl;
 
 }
 
@@ -381,18 +400,6 @@ void addFriends(People*p,People*newFriend){
     newFriend->next = p->friendsList;
     p->friendsList = newFriend;
 }
-/*
-void dataLoad() {
-
-    addPeople("Karina", 1, searchPlace("SantaClara",placeList), searchPlace("CQ",placeList));
-    addPeople("Leiner", 2, searchPlace("CQ",placeList), searchPlace("SantaClara",placeList));
-    addPeople("Tania", 3, searchPlace("Florencia",placeList), searchPlace("Muelle",placeList));
-    addPeople("Leidy", 4, searchPlace("Platanar",placeList), searchPlace("SantaClara",placeList));
-    addPeople("Enrique", 5, searchPlace("CQ",placeList), searchPlace("Florencia",placeList));
-    addPeople("Prueba", 6, searchPlace("Muelle",placeList), searchPlace("SantaClara",placeList));
-
-}*/
-
 
 void amplitude(){
     struct Place *tempP = graph1;
@@ -456,39 +463,42 @@ void unselect() {
  */
 
 int randomNum(int random){
-    int num = 0,c;
-    srand(time(NULL));
+    int num = 0;
+    int c = 0;
+    //srand(time(NULL));
 
 
-    for(c = 1; c <= random; c++)
-    {
-        num = 1 + rand() % (random - 1);
-        return num;
-    }
+    //for(c = 1; c <= random; c++)
+    //{
+    num = 1+rand() % random;
+    //cout<<num<<endl;
+    return num;
+    //}
 }
 /**
  * Crea un grafo con 5 vertices y 10 arcos.
  */
 void graph1Load(){
     int num = 0;
+    int r = 3;
     graph1 = addPlace("SantaClara",graph1);//A
     graph1 = addPlace("CQ",graph1);//B
     graph1 = addPlace("Florencia",graph1);//C
     graph1 = addPlace("Muelle",graph1);//D
     graph1 = addPlace("Platanar",graph1);//E
-    num = randomNum(100);
+    num = randomNum(r);
     addEdge("CQ",num,"SantaClara",graph1);
     addEdge("SantaClara",num,"CQ",graph1);
-    num = randomNum(100);
+    num = randomNum(r);
     addEdge("CQ",num ,"Florencia",graph1);
     addEdge("Florencia",num,"CQ",graph1);
-    num = randomNum(100);
+    num = randomNum(r);
     addEdge("Florencia",num,"Muelle",graph1);
     addEdge("Muelle",num,"Florencia",graph1);
-    num = randomNum(100);
+    num = randomNum(r);
     addEdge("Muelle",num,"Platanar",graph1);
     addEdge("Platanar",num,"Muelle",graph1);
-    num = randomNum(100);
+    num = randomNum(r);
     addEdge("Platanar",num,"SantaClara",graph1);
     addEdge("SantaClara",num,"Platanar",graph1);
 
@@ -497,7 +507,7 @@ void graph1Load(){
  * Crea un gráfico con 7 vertice y 26 arcos.
  */
 void graph2Load(){
-
+    int r = 3;
     graph2 = addPlace("SantaClara",graph2);//A
     graph2 = addPlace("CQ",graph2);//B
     graph2 = addPlace("Florencia",graph2);//C
@@ -505,46 +515,52 @@ void graph2Load(){
     graph2 = addPlace("Platanar",graph2);//E
     graph2 = addPlace("Tanque",graph2);//F
     graph2 = addPlace("Fortuna",graph2);//G
+    int num = 0;
+    num = randomNum(r);
+    addEdge("SantaClara", num,"CQ",graph2);
+    addEdge("CQ",num,"SantaClara",graph2);
+    num = randomNum(r);
+    addEdge("SantaClara",num,"Florencia",graph2);
+    addEdge("Florencia",num,"SantaClara",graph2);
+    num = randomNum(r);
+    addEdge("SantaClara",num,"Muelle",graph2);
+    addEdge("Muelle",num,"SantaClara",graph2);
+    num = randomNum(r);
+    addEdge("SantaClara",num,"Platanar",graph2);
+    addEdge("Platanar",num,"SantaClara",graph2);
+    num = randomNum(r);
+    addEdge("SantaClara",num,"Tanque",graph2);
+    addEdge("Tanque",num,"SantaClara",graph2);
+    num = randomNum(r);
+    addEdge("SantaClara",num,"Fortuna",graph2);
+    addEdge("Fortuna",num,"SantaClara",graph2);
 
-    addEdge("SantaClara",randomNum(100),"CQ",graph2);
+    addEdge("CQ",randomNum(r),"Florencia",graph2);
+    addEdge("CQ",randomNum(r),"Fortuna",graph2);
 
-    addEdge("CQ",randomNum(100),"SantaClara",graph2);
+    num = randomNum(r);
+    addEdge("Florencia",num,"Muelle",graph2);
+    addEdge("Muelle",num,"Florencia",graph2);
 
-    addEdge("SantaClara",randomNum(100),"Florencia",graph2);
-    addEdge("Florencia",randomNum(100),"SantaClara",graph2);
+    num = randomNum(r);
+    addEdge("Florencia",num,"Tanque",graph2);
+    addEdge("Tanque",num,"Florencia",graph2);
 
-    addEdge("SantaClara",randomNum(100),"Muelle",graph2);
-    addEdge("Muelle",randomNum(100),"SantaClara",graph2);
+    num = randomNum(r);
+    addEdge("Muelle",num,"Platanar",graph2);
+    addEdge("Platanar",num,"Muelle",graph2);
 
-    addEdge("SantaClara",randomNum(100),"Platanar",graph2);
-    addEdge("Platanar",randomNum(100),"SantaClara",graph2);
+    num = randomNum(r);
+    addEdge("Platanar",num,"Tanque",graph2);
+    addEdge("Tanque",num,"Platanar",graph2);
 
-    addEdge("SantaClara",randomNum(100),"Tanque",graph2);
-    addEdge("Tanque",randomNum(100),"SantaClara",graph2);
+    num = randomNum(r);
+    addEdge("Tanque",num,"Fortuna",graph2);
+    addEdge("Fortuna",num,"Tanque",graph2);
 
-    addEdge("SantaClara",randomNum(100),"Fortuna",graph2);
-    addEdge("Fortuna",randomNum(100),"SantaClara",graph2);
-
-    addEdge("CQ",randomNum(100),"Florencia",graph2);
-    addEdge("CQ",randomNum(100),"Fortuna",graph2);
-
-    addEdge("Florencia",randomNum(100),"Muelle",graph2);
-    addEdge("Muelle",randomNum(100),"Florencia",graph2);
-
-    addEdge("Florencia",randomNum(100),"Tanque",graph2);
-    addEdge("Tanque",randomNum(100),"Florencia",graph2);
-
-    addEdge("Muelle",randomNum(100),"Platanar",graph2);
-    addEdge("Platanar",randomNum(100),"Muelle",graph2);
-
-    addEdge("Platanar",randomNum(100),"Tanque",graph2);
-    addEdge("Tanque",randomNum(100),"Platanar",graph2);
-
-    addEdge("Tanque",randomNum(100),"Fortuna",graph2);
-    addEdge("Fortuna",randomNum(100),"Tanque",graph2);
-
-    addEdge("Fortuna",randomNum(100),"CQ",graph2);
-    addEdge("Florencia",randomNum(100),"CQ",graph2);
+    num = randomNum(r);
+    addEdge("Fortuna",num,"CQ",graph2);
+    addEdge("Florencia",num,"CQ",graph2);
 }
 int size(Edge*list){
     int cont =0;
@@ -567,7 +583,43 @@ Edge*searchIndex(int index,Edge*list){
     }
 }
 
+
+void finishWalk(People*p){
+    if (p->currentLocation->namePlace == p->placeDestination){
+        p->finish = true;
+    }
+}
 void random_walk(People*p,Place*pList){
+    string name = p->name;
+    string d = p->placeDestination;
+    if (p->localDestination !=NULL){
+        if (p->localDestination->distance > p->steps){
+            p->steps++;
+            return;
+        }
+        else{
+            Place*newPlace = searchPlace(p->localDestination->destination,pList);
+            deletePeopleToPlace(p,p->currentLocation);
+            p->totalTravel += p->steps;
+            p->steps = 0;
+            p->prePlace = p->currentLocation;
+            p->currentLocation = newPlace;
+            if (newPlace->subListPeople !=NULL){
+                People*temp = newPlace->subListPeople;
+                while(temp != NULL){
+                    addFriends(p,temp);
+                    temp = temp->next;
+                }
+            }
+            addPeopleToPlace(p,newPlace);
+            cout<<"\n"+p->currentLocation->namePlace<<endl;
+        }
+
+    }
+    finishWalk(p);
+    if (p->finish){
+        return;
+    }
     cout<<"\n"+p->currentLocation->namePlace<<endl;
     int n = 0;
     int num = 0;
@@ -576,7 +628,7 @@ void random_walk(People*p,Place*pList){
          num = randomNum(n);
     }
     Edge*tempList = p->currentLocation->subListEdge;
-    Edge*edge = searchIndex(num,tempList);
+    Edge*edge = searchIndex(num-1,tempList);
 
 
     if (p->prePlace !=NULL){
@@ -586,22 +638,9 @@ void random_walk(People*p,Place*pList){
         }
 
     }
-    deletePeopleToPlace(p,p->currentLocation);
-    Place*newPlace = searchPlace(edge->destination,pList);
-    p->totalTravel += tempList->distance;
-    p->prePlace = p->currentLocation;
-    p->currentLocation = newPlace;
+    p->localDestination = edge;
 
-    if (newPlace->subListPeople !=NULL){
-        People*temp = newPlace->subListPeople;
-        while(temp != NULL){
-            addFriends(p,temp);
-            temp = temp->next;
-        }
-    }
-    addPeopleToPlace(p,newPlace);
-    cout<<"\n"+p->currentLocation->namePlace<<endl;
-
+    p->steps++;
 }
 
 
@@ -675,7 +714,7 @@ bool searchPath( struct Place * origin, string destination,Place* pList){
 string rutaMenor = "";
 int distanciaMenor = 0;
 
-bool short_route(struct Place*origin, string destino, string ruta, int dis, Place*pList,People*people){
+bool short_route(struct Place*origin, string destino, string ruta, int dis, Place*pList){
 
     if((origin == NULL) or (origin->visited == true))
         return existPath;
@@ -692,20 +731,92 @@ bool short_route(struct Place*origin, string destino, string ruta, int dis, Plac
 
     struct Edge *tempA =origin->subListEdge;
     while(tempA != NULL){
-        short_route(searchPlace(tempA->destination,pList), destino, ruta + origin->namePlace, dis + tempA->distance, pList,people);
+        short_route(searchPlace(tempA->destination,pList), destino, ruta + origin->namePlace, dis + tempA->distance,pList);
         tempA = tempA->nextEdge;
     }
     origin->visited =false;
 }
 
-int main() {
-
-    //printPeopleList();
+void dataLoad() {
     graph1Load();
     graph2Load();
-    printPlace(graph1);
-    People*p = new People("Leiner",1, searchPlace("CQ",graph1),searchPlace("CQ",graph1),"Florencia");
-    addPeopleToPlace(p,searchPlace("CQ",graph1));
+    addPeople("Karina",1,"CQ","SantaClara",1,graph1);
+    //addPeople("Leiner",2,"Muelle","SantaClara",2,graph1);
+    //addPeople("Evelyn",3,"Florencia","Muelle",3,graph1);
+    //addPeople("Enrique",4,"Platanar","CQ",4,graph1);
+    //addPeople("Leidy",5,"SantaClara","Florencia",1,graph1);
+    //addPeople("Tania",6,"CQ","SantaClara",2,graph1);
+    //addPeople("Maria",7,"Muelle","SantaClara",3,graph1);
+    //addPeople("Johan",8,"Florencia","Muelle",4,graph1);
+    //addPeople("Anthony",9,"Platanar","CQ",4,graph1);
+    //addPeople("Jose",10,"SantaClara","Florencia",1,graph1);
+
+    //addPeople("Melanie",11,"CQ","SantaClara",2,graph2);
+    //addPeople("Vanessa",12,"Muelle","SantaClara",3,graph2);
+   // addPeople("Melissa",13,"Florencia","Muelle",4,graph2);
+    //addPeople("Janka",14,"Platanar","CQ",1,graph2);
+    //addPeople("Carlos",15,"SantaClara","Florencia",2,graph2);
+   // addPeople("Wilber",16,"Fortuna","SantaClara",3,graph2);
+    //addPeople("Manfred",17,"Tanque","SantaClara",4,graph2);
+    //addPeople("Brandon",18,"Florencia","Tanque",1,graph2);
+    //addPeople("Kevin",19,"Platanar","Fortuna",2,graph2);
+   // addPeople("Luis",20,"Fortuna","Tanque",3,graph2);
+
+}
+bool scanPeopleToWalk(){
+    People*temp = peopleList;
+    while(temp!=NULL){
+        if (!temp->finish){
+            return true;
+        }
+        temp = temp->next;
+    }
+    return false;
+}
+
+void walks(Place*graph){
+    People*temp = peopleList;
+
+    while (temp != NULL)
+    {
+        string des = temp->placeDestination;
+        if (temp->finish){
+            continue;
+        }
+        else if (temp->typeAdvance == 1){
+            random_walk(temp,graph);
+        }
+        else if (temp->typeAdvance == 2){
+            advacentRoute(temp,graph);
+        }
+        else if (temp->typeAdvance == 3){
+            //Falta
+        }
+        else if (temp->typeAdvance == 4){
+            short_route(searchPlace(temp->origin,graph), temp->placeDestination,"",0,graph);
+        }
+        cout<<temp->name<<"->"<<temp->totalTravel<<endl;
+        finishWalk(temp);
+
+        if (temp->next == NULL){
+            if (scanPeopleToWalk()){
+                temp = peopleList;
+            }
+            else{
+                break;
+            }
+        }else{
+            temp = temp->next;
+        }
+
+    }
+
+}
+int main() {
+    dataLoad();
+    walks(graph1);
+    //printPeopleList();
+    //printPlace(graph2);
 
   /*  cout<<"\n******************** PRUEBA DE RECORRIDO ADYACENTE ********************\n";
     advacentRoute(p,graph1);*/
@@ -719,7 +830,7 @@ int main() {
 
 
 
-
+    /*
     //random_walk(p,graph1);
     //random_walk(p,graph1);
     if(searchEdge(searchPlace("SantaClara",graph1),"CQ",graph1)){
@@ -752,7 +863,7 @@ int main() {
     existPath= false;
     unselect();
 
-
+    */
     return 0;
 }
 
