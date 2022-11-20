@@ -1,6 +1,8 @@
 #include <iostream>
 #include <string>
 #include<time.h>
+#include<stdlib.h>
+
 using namespace std;
 
 
@@ -464,23 +466,17 @@ void unselect() {
 
 int randomNum(int random){
     int num = 0;
-    int c = 0;
-    //srand(time(NULL));
-
-
-    //for(c = 1; c <= random; c++)
-    //{
-    num = 1+rand() % random;
-    //cout<<num<<endl;
+    num = 1+(rand() % random);
+    cout<<num<<endl;
     return num;
-    //}
+
 }
 /**
  * Crea un grafo con 5 vertices y 10 arcos.
  */
 void graph1Load(){
     int num = 0;
-    int r = 10;
+    int r = 15;
     graph1 = addPlace("SantaClara",graph1);//A
     graph1 = addPlace("CQ",graph1);//B
     graph1 = addPlace("Florencia",graph1);//C
@@ -645,10 +641,8 @@ void random_walk(People*p,Place*pList){
 
 
 void advacentRoute(People* people,Place* pList) {
-
-
-    Place *tempP = searchPlace(people->origin, pList);
-    people->currentLocation= tempP;
+    Place *tempP = people->currentLocation;
+    //people->currentLocation= tempP;
 
         if (people->placeDestination != people->currentLocation->namePlace) { //Si no ha llegado a su destino
             people->prePlace = tempP;
@@ -657,23 +651,22 @@ void advacentRoute(People* people,Place* pList) {
                     if (people->steps < people->localDestination->distance) {
                         people->steps++;//PREGUNTAR A LEINER SI LOS PASOS SE BASAN EN LA DISTANCIA O EL TOTAL DE ARCOS QUE IRA RECORRRIENDO
                     } else {
-                        people->totalSteps += people->steps;
+                        people->totalTravel += people->steps;
                         people->steps = 0;
-                        deletePeopleToPlace(people, people->prePlace);
+                        deletePeopleToPlace(people, people->currentLocation);
                         people->currentLocation = searchPlace(tempP->subListEdge->destination, pList);
                         addPeopleToPlace(people, people->currentLocation);
                         //addFriends(people,)
-
                     }
             } else {
-                people->localDestination = tempP->subListEdge;
+                people->localDestination = tempP->subListEdge->nextEdge;
                 if (people->steps < people->localDestination->distance) {
                     people->steps++;
                 } else {
-                    people->totalSteps += people->steps;
+                    people->totalTravel += people->steps;
                     people->steps = 0;
-                    deletePeopleToPlace(people, people->prePlace);
-                    people->currentLocation = searchPlace(tempP->subListEdge->destination, pList);
+                    deletePeopleToPlace(people, people->currentLocation);
+                    people->currentLocation = searchPlace(tempP->subListEdge->nextEdge->destination, pList);
                     addPeopleToPlace(people, people->currentLocation);
                 }
         }
@@ -884,20 +877,23 @@ void walks(Place*graph){
 
 }
 int main() {
+    srand(time(NULL));
     dataLoad();
-    //walks(graph1);
+    walks(graph1);
     //printPeopleList();
 
     //printPlace(graph2);
-    People* p = new People("Leiner",1,"Muelle","SantaClara",1);
-    addPeopleToPlace(p,graph1);
+    //People* p = new People("Leiner",1,"Muelle","SantaClara",1);
+    addPeople("Leiner",5,"Muelle","SantaClara",2,graph1);
+    People* p = searchPeople(5);
+    //addPeopleToPlace(p,graph1);
 
     cout<<"\n******************** PRUEBA DE RECORRIDO ADYACENTE ********************\n";
-    advacentRoute(p,graph1);
+   // advacentRoute(p,graph1);
     while(p->currentLocation->namePlace!=p->placeDestination){
         advacentRoute(p,graph1);
-        cout<<p->currentLocation->namePlace;
 
+        cout<<"Lugar actual: "<<p->currentLocation->namePlace<<endl;
     }
 
 
