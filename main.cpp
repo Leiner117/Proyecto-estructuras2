@@ -639,7 +639,7 @@ void random_walk(People*p,Place*pList){
 
     }
     p->localDestination = edge;
-
+    p->currentLocation = NULL;
     p->steps++;
 }
 
@@ -773,7 +773,74 @@ bool scanPeopleToWalk(){
     }
     return false;
 }
+void printStatusPeople(People*p){
 
+    if (p->currentLocation!= NULL){
+
+    }
+}
+int sizeFriendsList(People*p){
+    People*friends = p->friendsList;
+    int cont = 0;
+    while(friends!=NULL){
+        cont++;
+        friends = friends->next;
+    }
+    return cont;
+}
+void PeopleMoreFriends(){
+    People*temp = peopleList;
+    People*p = NULL;
+    while(temp!= NULL){
+        if (p == NULL){
+            p = temp;
+        }
+        else{
+            if (sizeFriendsList(temp) > sizeFriendsList(p)){
+                p = temp;
+            }
+        }
+        temp = temp->next;
+    }
+    cout<<"LA PERSONA CON MAS AMIGOS ES "<<p->name<<" con "<<sizeFriendsList(p)<< "amigos"<<endl;
+}
+void peopleFinishFirst(){
+    People*temp = peopleList;
+    People*p = NULL;
+    while(temp!= NULL){
+        if (!temp->finish){
+            continue;
+        }
+        else if (p == NULL){
+            p = temp;
+        }
+        else{
+            if (temp->totalTravel < p->totalTravel){
+                p = temp;
+            }
+        }
+        temp = temp->next;
+    }
+    cout<<"LA PERSONA QUE TERMINO MAS RAPIDO LA CAMINATA FUE "<<p->name<<endl;
+}
+/*void printStatusPeople(Place*graph){
+    Place*temp = graph;
+    while(temp!=NULL){
+        cout<<temp->namePlace<<endl;
+        People*listPeople = temp->subListPeople;
+        if (listPeople != NULL){
+            cout<<"Personas en el lugar:"<<endl;
+            while(listPeople!=NULL){
+                cout<<temp->subListPeople->name;
+            }
+        }
+        else{
+            cout<<"No hay personas en el lugar";
+        }
+
+
+    }
+}*/
 void walks(Place*graph){
     People*temp = peopleList;
 
