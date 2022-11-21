@@ -979,9 +979,96 @@ void walks(Place*graph){
     }
 
 }
+
+
+//Bienvenida al sistema
+void welcome(){
+    system("cls");
+    cout << "\n\n\n";
+    cout << "\t\t\t * * *   *   *****  **    *   * * *   *****  **    *  *  *****    *****  "<< endl;
+    cout << "\t\t\t *   *      *       * *   *   *   *  *       * *   *     *    *  *     * "<< endl;
+    cout << "\t\t\t * * *   *  ****    *  *  *   * * *  ****    *  *  *  *  *    *  *     * "<< endl;
+    cout << "\t\t\t *   *   *  *       *   * *   *   *  *       *   * *  *  *    *  *     * "<< endl;
+    cout << "\t\t\t * * *   *   *****  *    **   * * *   *****  *    **  *  *****    *****  "<< endl;
+    cout<<endl;
+    cout<<"\t\t\t=========================================================================="<<endl;
+    cout<<"\t\t\t\t\t                  SISTEMA DE RECORRIDO DE GRAFOS                     "<<endl;
+    cout<<"\t\t\t=========================================================================="<<endl;
+    cout<<endl;
+    cout<<"\t\t\t\t1. MENU PRINCIPAL\n\n";
+    cout<<"\t\t\t\t2. SALIR\n\n";
+
+}
+
+void optionListSublis(){
+    system("cls");
+    cout<<"\t\t======================================================"<<endl;
+    cout<<"\t\t\t        SELECCIONE UNA OPCIÓN  "<<endl;
+    cout<<"\t\t======================================================"<<endl;
+    cout<<endl;
+    cout<<"\t\t1.LISTA DE PERSONAS\n\n";
+    cout<<"\t\t2.LISTA DE VERTICE\n\n";
+    cout<<"\t\t3.LISTA DE ARCOS\n\n";
+    cout<<"\t\t4.AVANZAR EN EL GRAFO\n\n";
+    cout<<"\t\t5.VER CONSULTAS\n\n";
+    cout<<"\t\t6.VER REPORTES\n\n";
+    cout<<"\t\t0.REGRESAR\n\n";
+    cout<<"\t\t======================================================"<<endl;
+}
+
 int main() {
-    graph1Load();
+    dataLoad();
     srand(time(NULL));
+
+    char c; //OPCION DEL MENU PREINCIPAL
+    char p; //OPCION DE LAS LISTAS
+    char b; //OPCION DE LISTAS EN REPORTES
+
+
+    while(true){
+        welcome();
+        cout<<"\n\t\tELIGA UNA OPCION:";
+        cin>>c;
+
+        if(c=='1'){
+
+        }
+        else if(c=='1'){
+
+        }
+        else if(c=='1'){
+
+        }
+        else if(c=='1'){
+
+        }
+        else if(c=='1'){
+
+        }
+        else if(c=='0'){ //SALIR
+            system("cls");
+            cout << "\n\t\t               GRACIAS POR USAR ESTE SISTEMA"<<endl;
+            cout <<endl;
+            cout <<"\n\t\t         PROYECTO 2  ESTRUCTURAS DE GRAFOS \n";
+            cout<<"\n\t\t\t =========================================\n";
+            cout<<"\n\t\t\t MIEMBROS DEL GRUPO (DESARROLLADORES)";
+            cout << "\n\n";
+            cout << "\n\t\t\t NOMBRE                        CARNET\n\n";
+            cout << "\n\t\t\t 1. lEINER ALVARADO           2022437759\n\n";
+            cout << "\n\t\t\t 2. KARINA URBINA             2022038549\n\n";
+            cout<<"\n\t\t\t =========================================\n";
+            cout<<"\n\t\t\t START DATE: 8/11/2022\n";
+            cout<<"\n\t\t\t END DATE: 20/11/2022 ";
+            cout << "\n\n";
+            break;
+
+        }
+
+    }
+
+
+
+
    //dataLoad();
     //walks(graph1);
     //printPeopleList();
@@ -1001,7 +1088,7 @@ int main() {
         cout<<"Lugar actual: "<<p->currentLocation->namePlace<<endl;
     }
 
-
+*/
 
 
 
