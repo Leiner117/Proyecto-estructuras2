@@ -30,11 +30,14 @@ struct Place{
 struct Edge{
     int distance;
     string destination;
+    bool state;
     struct Edge* nextEdge; //para enlazar todos los vertices en una lista
     Edge(int dis,string des){
         distance = dis;
         destination = des;
         nextEdge = NULL;
+        state= false;
+
     }
 };
 
@@ -647,39 +650,46 @@ void random_walk(People*p,Place*pList){
 
 
 void advacentRoute(People* people,Place* pList) {
-    Place *tempP = people->currentLocation;
-    //people->currentLocation= tempP;
+    finishWalk(people);
 
-        if (people->placeDestination != people->currentLocation->namePlace) { //Si no ha llegado a su destino
-            people->prePlace = tempP;
-            if (tempP->subListEdge->distance <= tempP->subListEdge->nextEdge->distance) { //se busca el camino mas corto
-                people->localDestination = tempP->subListEdge;
-                    if (people->steps < people->localDestination->distance) {
-                        people->steps++;//PREGUNTAR A LEINER SI LOS PASOS SE BASAN EN LA DISTANCIA O EL TOTAL DE ARCOS QUE IRA RECORRRIENDO
-                    } else {
-                        people->totalTravel += people->steps;
-                        people->steps = 0;
-                        deletePeopleToPlace(people, people->currentLocation);
-                        people->currentLocation = searchPlace(tempP->subListEdge->destination, pList);
-                        addPeopleToPlace(people, people->currentLocation);
-                        //addFriends(people,)
-                    }
+    if (!people->finish) { //Si no ha llegado a su destino
+
+        if(people->currentLocation !=NULL){
+            people->prePlace = people->currentLocation;
+        }
+
+        Place* tempP = people->prePlace;
+
+        if (tempP->subListEdge->distance <= tempP->subListEdge->nextEdge->distance){ //se busca el camino mas corto
+            people->localDestination = tempP->subListEdge;
+            people->localDestination->state= true;
+            if (people->steps < people->localDestination->distance) {
+                people->steps++;
+                people->currentLocation = NULL;
             } else {
-                people->localDestination = tempP->subListEdge->nextEdge;
-                if (people->steps < people->localDestination->distance) {
-                    people->steps++;
-                } else {
-                    people->totalTravel += people->steps;
-                    people->steps = 0;
-                    deletePeopleToPlace(people, people->currentLocation);
-                    people->currentLocation = searchPlace(tempP->subListEdge->nextEdge->destination, pList);
-                    addPeopleToPlace(people, people->currentLocation);
-                }
+                people->currentLocation = searchPlace(people->localDestination->destination,pList); //searchPlace(tempP->subListEdge->destination, pList);
+                people->totalTravel += people->steps;
+                people->steps = 0;
+                deletePeopleToPlace(people, people->prePlace);
+                addPeopleToPlace(people, people->currentLocation);
+            }
+        }
+        else {
+            people->localDestination = tempP->subListEdge->nextEdge;
+            if (people->steps < people->localDestination->distance) {
+                people->steps++;
+                people->currentLocation = NULL;
+            } else {
+                people->currentLocation = searchPlace(people->localDestination->destination,pList);
+                people->totalTravel += people->steps;
+                people->steps = 0;
+                deletePeopleToPlace(people, people->prePlace);
+                addPeopleToPlace(people, people->currentLocation);
+            }
         }
 
     }
 }
-
 
 bool searchPath( struct Place * origin, string destination,Place* pList){
 
