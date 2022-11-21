@@ -2,6 +2,7 @@
 #include <string>
 #include<time.h>
 #include<stdlib.h>
+#include <sstream>
 
 using namespace std;
 
@@ -55,6 +56,7 @@ struct People{
     bool finish;
     int steps;
     int totalSteps;
+    struct Place*shortRoute;
     Edge*localDestination;
     People(string n,int i,string orig,string  des,short type){
         origin = orig;
@@ -72,6 +74,7 @@ struct People{
         steps = 0;
         totalSteps = 0;
         localDestination =NULL;
+        shortRoute = NULL;
     }
 
 }*peopleList;
@@ -609,7 +612,7 @@ void random_walk(People*p,Place*pList){
                 }
             }
             addPeopleToPlace(p,newPlace);
-            cout<<"\n"+p->currentLocation->namePlace<<endl;
+            //cout<<"\n"+p->currentLocation->namePlace<<endl;
         }
 
     }
@@ -617,7 +620,7 @@ void random_walk(People*p,Place*pList){
     if (p->finish){
         return;
     }
-    cout<<"\n"+p->currentLocation->namePlace<<endl;
+    //cout<<"\n"+p->currentLocation->namePlace<<endl;
     int n = 0;
     int num = 0;
     n = size(p->currentLocation->subListEdge);
@@ -714,7 +717,7 @@ bool searchPath( struct Place * origin, string destination,Place* pList){
 string rutaMenor = "";
 int distanciaMenor = 0;
 
-bool short_route(struct Place*origin, string destino, string ruta, int dis, Place*pList){
+bool getShort_route(struct Place*origin, string destino, string ruta, int dis, Place*pList){
 
     if((origin == NULL) or (origin->visited == true))
         return existPath;
@@ -731,12 +734,28 @@ bool short_route(struct Place*origin, string destino, string ruta, int dis, Plac
 
     struct Edge *tempA =origin->subListEdge;
     while(tempA != NULL){
-        short_route(searchPlace(tempA->destination,pList), destino, ruta + origin->namePlace, dis + tempA->distance,pList);
+        getShort_route(searchPlace(tempA->destination, pList), destino, ruta + origin->namePlace + ",",dis + tempA->distance, pList);
         tempA = tempA->nextEdge;
     }
     origin->visited =false;
 }
+void changeShortRoute(People*people,Place*pList){
+    Place*temp = NULL;
+    string place;
+    if (getShort_route(searchPlace(people->origin,pList),people->placeDestination,"",0,pList)){
+        stringstream route(rutaMenor);
+        while(getline(route, place, ',')){
+            addPlace(place,temp);
+        }
+    }
+    people->shortRoute;
+}
+void shortRoute(People*people,Place*pList){
 
+
+
+
+}
 void dataLoad() {
     graph1Load();
     graph2Load();
@@ -763,6 +782,13 @@ void dataLoad() {
    // addPeople("Luis",20,"Fortuna","Tanque",3,graph2);
 
 }
+/**
+ * Devuelve verdadero si hay personas que no han terminado de caminar, y falso si no hay personas que no hayan terminado de
+ * caminar.
+ *
+ * Returns:
+ *   Un valor booleano.
+ */
 bool scanPeopleToWalk(){
     People*temp = peopleList;
     while(temp!=NULL){
@@ -773,12 +799,64 @@ bool scanPeopleToWalk(){
     }
     return false;
 }
+/**
+ * Devuelve una cadena que representa el tipo de avance que ha elegido el usuario
+ *
+ * Args:
+ *   i (int): El número de avance.
+ *
+ * Returns:
+ *   La cadena del avance
+ */
+string typeAdvange(int i){
+    string ad = "";
+    if (i == 1){
+        ad = "ALEATORIO";
+    }
+    else if (i == 2){
+        ad = "ADYACENTE MAS CERCANO";
+    }
+    else if (i == 3){
+        ad = "RUTA CORTA DESDE PUNTO DE PARTIDA";
+    }
+    else if (i == 4){
+        ad = "RUTA CORTA DESDE LUGAR ESPEFICIO";
+    }
+    return ad;
+}
+/**Consulta 1
+ * Imprime el estado de una persona
+ *
+ * Args:
+ *   p (People): puntero a la persona
+ */
 void printStatusPeople(People*p){
 
     if (p->currentLocation!= NULL){
-
+        cout<<"PERSONA: "<<p->name<<endl;
+        cout<<"METODO DE AVANCE: "<<typeAdvange(p->typeAdvance)<<endl;
+        cout<<"LUGAR ACTUAL: "<<p->currentLocation->namePlace;
+        if (p->currentLocation->subListPeople != NULL){
+            People*temp = p->currentLocation->subListPeople;
+            cout<<"PERSONA EN "<<temp->name<<":"<<endl;
+            while (temp != NULL){
+                cout<<temp->name;
+            }
+        }
+        else{
+            cout<<"NO HAY PERSONAS EN EL LUGAR ACTUALMENTE"<<endl;
+        }
     }
 }
+/**
+ * Devuelve el número de amigos de una persona.
+ *
+ * Args:
+ *   p (People): puntero a la persona cuya lista de amigos desea saber el tamaño de
+ *
+ * Returns:
+ *   El número de amigos de una persona.
+ */
 int sizeFriendsList(People*p){
     People*friends = p->friendsList;
     int cont = 0;
@@ -788,6 +866,10 @@ int sizeFriendsList(People*p){
     }
     return cont;
 }
+/**Consulta 2
+ * Revisa la lista de personas y compara el tamaño de la lista de amigos de cada persona, y luego imprime el nombre de la
+ * persona con la lista de amigos más grande
+ */
 void PeopleMoreFriends(){
     People*temp = peopleList;
     People*p = NULL;
@@ -804,6 +886,9 @@ void PeopleMoreFriends(){
     }
     cout<<"LA PERSONA CON MAS AMIGOS ES "<<p->name<<" con "<<sizeFriendsList(p)<< "amigos"<<endl;
 }
+/**Consulta 3
+ * Recorre la lista de personas y encuentra la que terminó primero.
+ */
 void peopleFinishFirst(){
     People*temp = peopleList;
     People*p = NULL;
@@ -821,26 +906,31 @@ void peopleFinishFirst(){
         }
         temp = temp->next;
     }
-    cout<<"LA PERSONA QUE TERMINO MAS RAPIDO LA CAMINATA FUE "<<p->name<<endl;
+    cout<<"LA PERSONA QUE TERMINO PRIMERO LA CAMINATA FUE "<<p->name<<endl;
 }
-/*void printStatusPeople(Place*graph){
-    Place*temp = graph;
-    while(temp!=NULL){
-        cout<<temp->namePlace<<endl;
-        People*listPeople = temp->subListPeople;
-        if (listPeople != NULL){
-            cout<<"Personas en el lugar:"<<endl;
-            while(listPeople!=NULL){
-                cout<<temp->subListPeople->name;
-            }
+
+/**Consulta 4
+ * Revisa la lista de personas y encuentra la que terminó en último lugar.
+ */
+void lastPeopleFinish(){
+    People*temp = peopleList;
+    People*p = NULL;
+    while(temp!= NULL){
+        if (!temp->finish){
+            continue;
+        }
+        else if (p == NULL){
+            p = temp;
         }
         else{
-            cout<<"No hay personas en el lugar";
+            if (temp->totalTravel > p->totalTravel){
+                p = temp;
+            }
         }
-
-
+        temp = temp->next;
     }
-}*/
+    cout<<"LA PERSONA QUE TERMINO DE ULTIMO LA CAMINATA FUE "<<p->name<<endl;
+}
 void walks(Place*graph){
     People*temp = peopleList;
 
@@ -860,7 +950,7 @@ void walks(Place*graph){
             //Falta
         }
         else if (temp->typeAdvance == 4){
-            short_route(searchPlace(temp->origin,graph), temp->placeDestination,"",0,graph);
+            getShort_route(searchPlace(temp->origin, graph), temp->placeDestination, "", 0, graph);
         }
         cout<<temp->name<<"->"<<temp->totalTravel<<endl;
         finishWalk(temp);
@@ -880,9 +970,10 @@ void walks(Place*graph){
 
 }
 int main() {
+    graph1Load();
     srand(time(NULL));
-    dataLoad();
-    walks(graph1);
+   //dataLoad();
+    //walks(graph1);
     //printPeopleList();
 
     //printPlace(graph2);
@@ -890,6 +981,7 @@ int main() {
     addPeople("Leiner",5,"Muelle","SantaClara",2,graph1);
     People* p = searchPeople(5,peopleList);
     //addPeopleToPlace(p,graph1);
+    getShort_route(searchPlace(p->origin, graph1), p->placeDestination, "", 0, graph1);
 
     cout<<"\n******************** PRUEBA DE RECORRIDO ADYACENTE ********************\n";
    // advacentRoute(p,graph1);
@@ -930,7 +1022,7 @@ int main() {
 
     cout<<"\n\n.................Rutas Cortas...................\n";
 
-    short_route(searchPlace("SantaClara",graph1), "CQ", "",0,graph1,p);
+    getShort_route(searchPlace("SantaClara",graph1), "CQ", "",0,graph1,p);
     if(existPath == true){
         cout<<"\n\nLa ruta mas corta es: "<<rutaMenor
             << "con una distancia de: "<<distanciaMenor;
