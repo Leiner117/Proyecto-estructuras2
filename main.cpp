@@ -297,11 +297,11 @@ void addPeople(string name,int id,string orig,string des,short typeAdvange,Place
  * Returns:
  *   Un puntero a un objeto Personas.
  */
-People*searchPeople(int id){
+People*searchPeople(int id,People*pList){
     if(peopleList == NULL){
         return NULL;
     }
-    People*peopleTemp = peopleList;
+    People*peopleTemp = pList;
     while(peopleTemp != NULL){
         if(peopleTemp->id == id){
             return peopleTemp;
@@ -325,8 +325,8 @@ People*searchPeople(int id){
  *   la lista de personas
  */
 
-void modPeople(int oldId,string newName,int newId,Place*current,string des){
-    People*people = searchPeople(oldId);
+void modPeople(int oldId,string newName,int newId,Place*current,string des,People*pList){
+    People*people = searchPeople(oldId,pList);
     if(people == NULL){
         cout<<"\nLA PERSONA NO SE ENCUENTRA REGISTRADA "<<endl;
     }
@@ -350,7 +350,7 @@ void modPeople(int oldId,string newName,int newId,Place*current,string des){
  *   la lista de personas
  */
 void deletePeople(int oldId,People*pList){
-    People*people = searchPeople(oldId);
+    People*people = searchPeople(oldId,pList);
     if (people == NULL){
         cout<<"\nLA PERSONA NO EXISTE";
     }
@@ -581,8 +581,10 @@ Edge*searchIndex(int index,Edge*list){
 
 
 void finishWalk(People*p){
-    if (p->currentLocation->namePlace == p->placeDestination){
-        p->finish = true;
+    if (p->currentLocation != NULL){
+        if (p->currentLocation->namePlace == p->placeDestination){
+            p->finish = true;
+        }
     }
 }
 void random_walk(People*p,Place*pList){
@@ -595,14 +597,13 @@ void random_walk(People*p,Place*pList){
         }
         else{
             Place*newPlace = searchPlace(p->localDestination->destination,pList);
-            deletePeopleToPlace(p,p->currentLocation);
             p->totalTravel += p->steps;
             p->steps = 0;
-            p->prePlace = p->currentLocation;
             p->currentLocation = newPlace;
             if (newPlace->subListPeople !=NULL){
                 People*temp = newPlace->subListPeople;
                 while(temp != NULL){
+
                     addFriends(p,temp);
                     temp = temp->next;
                 }
@@ -635,6 +636,8 @@ void random_walk(People*p,Place*pList){
 
     }
     p->localDestination = edge;
+    p->prePlace = p->currentLocation;
+    deletePeopleToPlace(p,p->currentLocation);
     p->currentLocation = NULL;
     p->steps++;
 }
@@ -885,7 +888,7 @@ int main() {
     //printPlace(graph2);
     //People* p = new People("Leiner",1,"Muelle","SantaClara",1);
     addPeople("Leiner",5,"Muelle","SantaClara",2,graph1);
-    People* p = searchPeople(5);
+    People* p = searchPeople(5,peopleList);
     //addPeopleToPlace(p,graph1);
 
     cout<<"\n******************** PRUEBA DE RECORRIDO ADYACENTE ********************\n";
